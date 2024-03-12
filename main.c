@@ -17,7 +17,7 @@ int countENRUwords(FILE* eng, FILE* rus)
     while ((ch = fgetc(rus)) != EOF)
     {
         if(ch == '\n')
-            RUcount++;
+            RUcount++; 
     }
     
     if (RUcount > ENcount)
@@ -52,8 +52,8 @@ int main(int argc,char *argv[])
     
     int countWords = countENRUwords(eng, rus);
     srand(time(NULL));
-    int ramdomENRUword;
-    char RUbufer[countWords][256],  ENbufer[countWords][256], workprogramm;
+    
+    char RUbufer[countWords][256], ENbufer[countWords][256], worduser[256], words[countWords][256], workprogramm, simbol;
 
     fseek(rus, 0, SEEK_SET);
     fseek(eng, 0, SEEK_SET);
@@ -66,27 +66,65 @@ int main(int argc,char *argv[])
         fgets(ENbufer[i], sizeof(ENbufer[i]), eng);
         ENbufer[i][strcspn(ENbufer[i], "\n")] = '\0';
     }
-
-    for (int i = 0; i < countWords; i++)
-    {
-        printf("%s\n", RUbufer[i]);
-    }
-        for (int i = 0; i < countWords; i++)
-    {
-        printf("%s\n", ENbufer[i]);
-    }
     
+    int ramdomENRUword;
+    int mistakes = 0;
 
-    
+    printf("Слова какого языка хотите переводить (E/R): ");
+    scanf("%c", &workprogramm);
 
-    /*while (workprogramm != 'q')
+    while(workprogramm != '~') 
     {
+        if (workprogramm == 'R')
+        {
+           for (int i = 0; i < countWords; ++i)
+            {
+                ramdomENRUword = rand() % countWords + 1;
+                printf("%s\n", RUbufer[ramdomENRUword]);
+                printf("Введите слово(для выхода '~'): ");
+                scanf("%s", worduser);
 
+                for (int j = 0; simbol != '\0' ; ++j)
+                {
+                    words[i][j] = worduser[j];
+                    printf("%c",worduser[j]);
+                    printf("%c", words[i][j]);
+                    simbol = worduser[j];
+                }
 
-        printf("For exit 'q': ");
-        scanf("%s", &workprogramm);
+                if (worduser[0] == '~')
+                {
+                    break;
+                }
+            }
+        }
+        else if(workprogramm == 'E') {
+            for (int i = 0; i < countWords; ++i)
+            {
+                ramdomENRUword = rand() % countWords + 1;
+                printf("%s\n", ENbufer[ramdomENRUword]);
+                printf("Введите слово(для выхода '~'): ");
+                scanf("%s", worduser);
+                if (worduser[0] == '~')
+                {
+                    break;
+                }
+            }
+        }
+        printf("Поменять язык(E/R)/Закончить(~)");
+        scanf("%c", &workprogramm);
     }
-    */
+
+    for (int i = 0; i < 64; i++)
+    {
+        for (int j = 0; j < 64; j++)
+        {
+            printf("%c", words[i][j]);
+        }
+            
+    }
+    printf("chto za huina");
+    
     
     fclose(rus);
     fclose(eng);
