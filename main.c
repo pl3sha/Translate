@@ -3,13 +3,13 @@
 #include <time.h>
 #include <string.h>
 
-void clearInBuffer()
+void Clear_Buffer()
 {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void clearConsole() {
+void Clear_Console() {
     #ifdef _WIN32
         system("cls");
     #else
@@ -17,7 +17,7 @@ void clearConsole() {
     #endif
 }
 
-int countENRUwords(FILE* eng, FILE* rus) 
+int Counting_words_in_files(FILE* eng, FILE* rus) 
 {
     char ch;
     int RUcount = 0, ENcount = 0;;
@@ -50,39 +50,39 @@ int countENRUwords(FILE* eng, FILE* rus)
     return RUcount;
 }
 
-void SaveTxt(FILE* eng, FILE* rus, char (*RUbufer)[256], char (*ENbufer)[256], int countWords)
+void Saving_words_into_arrays(FILE* eng, FILE* rus, char (*RUwordsArr)[256], char (*ENwordsArr)[256], int NumOfWords)
 {
     fseek(rus, 0, SEEK_SET);
     fseek(eng, 0, SEEK_SET);
 
-    for (int i = 0; i < countWords; i++) {
-        fgets(RUbufer[i], sizeof(RUbufer[i]), rus);
-        int len = strlen(RUbufer[i]);
-        while (len > 0 && (RUbufer[i][len - 1] == ' ' || RUbufer[i][len - 1] == '\t' || RUbufer[i][len - 1] == '\n'))
+    for (int i = 0; i < NumOfWords; i++) {
+        fgets(RUwordsArr[i], sizeof(RUwordsArr[i]), rus);
+        int len = strlen(RUwordsArr[i]);
+        while (len > 0 && (RUwordsArr[i][len - 1] == ' ' || RUwordsArr[i][len - 1] == '\t' || RUwordsArr[i][len - 1] == '\n'))
         {
-            RUbufer[i][len - 1] = '\0';
+            RUwordsArr[i][len - 1] = '\0';
             len--;
         }
     }
 
-    for (int i = 0; i < countWords; i++) {
-        fgets(ENbufer[i], sizeof(ENbufer[i]), eng);
-        int len2 = strlen(ENbufer[i]);
-        while (len2 > 0 && (ENbufer[i][len2 - 1] == ' ' || ENbufer[i][len2 - 1] == '\t' || ENbufer[i][len2 - 1] == '\n'))
+    for (int i = 0; i < NumOfWords; i++) {
+        fgets(ENwordsArr[i], sizeof(ENwordsArr[i]), eng);
+        int len2 = strlen(ENwordsArr[i]);
+        while (len2 > 0 && (ENwordsArr[i][len2 - 1] == ' ' || ENwordsArr[i][len2 - 1] == '\t' || ENwordsArr[i][len2 - 1] == '\n'))
         {
-            ENbufer[i][len2 - 1] = '\0';
+            ENwordsArr[i][len2 - 1] = '\0';
             len2--;
         }
     }
 }
 
-char checkRU_EN(char (*ENbufer)[256], int countWord, char *worduser) 
+char checkRU_EN(char (*ENwordsArr)[256], int countWord, char *UserWords) 
 {
     char correct;
     correct = '+';
-    for (int j = 0; ENbufer[countWord][j] != '\0'; j++)
+    for (int j = 0; ENwordsArr[countWord][j] != '\0'; j++)
     {
-        if (ENbufer[countWord][j] != worduser[j])
+        if (ENwordsArr[countWord][j] != UserWords[j])
         {
             correct = '-';
             break;
@@ -91,34 +91,34 @@ char checkRU_EN(char (*ENbufer)[256], int countWord, char *worduser)
     return correct;
 }
 
-int RU_EN(char (*ENbufer)[256] ,char (*RUbufer)[256], char (*writewords)[256], char *worduser, int countWords, int count) 
+int RU_EN(char (*ENwordsArr)[256] ,char (*RUwordsArr)[256], char (*WritWords)[256], char *UserWords, int NumOfWords, int count) 
 {   
     char correct;
     int countWord;
 
-    for (int i = 0; i < countWords; ++i)
+    for (int i = 0; i < NumOfWords; ++i)
     {   
-        clearConsole();
+        Clear_Console();
         countWord = i;
-        printf("(%d)Введите: %s\n",i+1, RUbufer[countWord]);
+        printf("(%d)Введите: %s\n",i+1, RUwordsArr[countWord]);
         printf("(Для выхода '~'): ");
-        fgets(worduser, 255, stdin);
-        if (worduser[0] == '~')
+        fgets(UserWords, 255, stdin);
+        if (UserWords[0] == '~')
            break;
 
-        worduser[strcspn(worduser, "\n")] = '\0';
+        UserWords[strcspn(UserWords, "\n")] = '\0';
 
-        correct = checkRU_EN(ENbufer, countWord, worduser);
+        correct = checkRU_EN(ENwordsArr, countWord, UserWords);
 
-        size_t totalLength = strlen(ENbufer[countWord]) + strlen(worduser) + 5;
+        size_t totalLength = strlen(ENwordsArr[countWord]) + strlen(UserWords) + 5;
 
-        if (totalLength < sizeof(writewords[i]))
+        if (totalLength < sizeof(WritWords[i]))
         {   
-            sprintf(writewords[i], "%c %d) %s\n     %s - %s", correct, i+1, RUbufer[countWord], ENbufer[countWord], worduser);
+            sprintf(WritWords[i], "%c %d) %s\n     %s - %s", correct, i+1, RUwordsArr[countWord], ENwordsArr[countWord], UserWords);
         }
         else
         {
-            printf("Недостаточно место в writewords[i] = %ld", sizeof(writewords[i]));
+            printf("Недостаточно место в WritWords[i] = %ld", sizeof(WritWords[i]));
             break;
         }
         count++;
@@ -126,13 +126,13 @@ int RU_EN(char (*ENbufer)[256] ,char (*RUbufer)[256], char (*writewords)[256], c
     return count;
 }
 
-char checkEN_RU(char (*RUbufer)[256], int countWord, char *worduser)
+char checkEN_RU(char (*RUwordsArr)[256], int countWord, char *UserWords)
 {
     char correct;
     correct = '+';
-    for (int j = 0; RUbufer[countWord][j] != '\0'; j++)
+    for (int j = 0; RUwordsArr[countWord][j] != '\0'; j++)
     {
-        if (RUbufer[countWord][j] != worduser[j])
+        if (RUwordsArr[countWord][j] != UserWords[j])
         {
             correct = '-';
             break;
@@ -141,34 +141,34 @@ char checkEN_RU(char (*RUbufer)[256], int countWord, char *worduser)
     return correct;
 }
 
-int EN_RU(char (*ENbufer)[256] , char (*RUbufer)[256], char (*writewords)[256], char *worduser, int countWords, int count) 
+int EN_RU(char (*ENwordsArr)[256] , char (*RUwordsArr)[256], char (*WritWords)[256], char *UserWords, int NumOfWords, int count) 
 {   
     char correct;
     int countWord;
 
-    for (int i = 0; i < countWords; ++i)
+    for (int i = 0; i < NumOfWords; ++i)
     {
-        clearConsole();
+        Clear_Console();
         countWord = i;
-        printf("(%d)Введите: %s\n",i+1, ENbufer[countWord]);
+        printf("(%d)Введите: %s\n",i+1, ENwordsArr[countWord]);
         printf("(Для выхода '~'): ");
-        fgets(worduser, 255, stdin);
-        if (worduser[0] == '~')
+        fgets(UserWords, 255, stdin);
+        if (UserWords[0] == '~')
            break;
 
-        worduser[strcspn(worduser, "\n")] = '\0';
+        UserWords[strcspn(UserWords, "\n")] = '\0';
         
-        correct = checkRU_EN(RUbufer, countWord, worduser);
+        correct = checkRU_EN(RUwordsArr, countWord, UserWords);
 
-        size_t totalLength = strlen(RUbufer[countWord]) + strlen(worduser) + 5;
+        size_t totalLength = strlen(RUwordsArr[countWord]) + strlen(UserWords) + 5;
 
-        if (totalLength < sizeof(writewords[i]))
+        if (totalLength < sizeof(WritWords[i]))
         {   
-            sprintf(writewords[i], "%c %d) %s\n     %s - %s", correct, i+1, ENbufer[countWord],  RUbufer[countWord], worduser);
+            sprintf(WritWords[i], "%c %d) %s\n     %s - %s", correct, i+1, ENwordsArr[countWord],  RUwordsArr[countWord], UserWords);
         }
         else
         {
-            printf("Недостаточно место в writewords[i] = %ld", sizeof(writewords[i]));
+            printf("Недостаточно место в WritWords[i] = %ld", sizeof(WritWords[i]));
             break;
         }
         count++;
@@ -176,7 +176,13 @@ int EN_RU(char (*ENbufer)[256] , char (*RUbufer)[256], char (*writewords)[256], 
     return count;
 }
 
-int main(int argc,char *argv[]) //ʕ ᵔᴥᵔ ʔ
+/*
+void sortWritWords()
+{
+
+}
+*/
+int main(int argc,char *argv[]) /*ʕ ᵔᴥᵔ ʔ*/
 {
 	FILE *rus = fopen(argv[1],"r");
     FILE *eng = fopen(argv[2],"r");
@@ -190,49 +196,56 @@ int main(int argc,char *argv[]) //ʕ ᵔᴥᵔ ʔ
         return 0;
     }
 
-    int countWords = countENRUwords(eng, rus), count = 0, Right = 0;
-    char RUbufer[countWords][256], ENbufer[countWords][256], worduser[256], writewords[countWords][256], workprogramm;
+    int NumOfWords = Counting_words_in_files(eng, rus), count = 0, Right = 0, mistake;
+    char RUwordsArr[NumOfWords][256], ENwordsArr[NumOfWords][256], UserWords[256], WritWords[NumOfWords][256], workprogramm;
 
-    SaveTxt(eng, rus, RUbufer, ENbufer, countWords);
+    Saving_words_into_arrays(eng, rus, RUwordsArr, ENwordsArr, NumOfWords);
    
     printf("Слова какого языка хотите переводить (E/R): ");
     workprogramm = getchar();
-    clearInBuffer();
+    Clear_Buffer();
+
     while(workprogramm != '~') 
     {
-        clearConsole();
+        Clear_Console();
         if (workprogramm == 'R')
         {
-            count = RU_EN(ENbufer ,RUbufer, writewords, worduser, countWords, count);
+            count = RU_EN(ENwordsArr ,RUwordsArr, WritWords, UserWords, NumOfWords, count);
         }
         if(workprogramm == 'E') {
 
-            count = EN_RU(ENbufer, RUbufer, writewords, worduser, countWords, count);
+            count = EN_RU(ENwordsArr, RUwordsArr, WritWords, UserWords, NumOfWords, count);
         }
 
-        clearConsole();
+        Clear_Console();
         for (int i = 0; i < count; i++)
         {
-            printf("%s\n", writewords[i]);
+            printf("%s\n", WritWords[i]);
             printf("\n");
         }
         for (int i = 0, j = 0; i < count; i++)
         {
             
-            if (writewords[i][j] == '+')
+            if (WritWords[i][j] == '+')
             {
                 Right++;
             }
-            
         }
-        printf("Напис./Всего: %d/%d\n", count, countWords);
+        printf("Напис./Всего: %d/%d\n", count, NumOfWords);
         printf("Правильные/Напис: %d/%d\n", Right ,count);
         
         count = 0;
 
-        printf("Поменять язык(E/R)/Закончить(~): ");
+        printf("Сделать работу над ошибками(@)/Закончить(~): ");
         scanf(" %c", &workprogramm);
-        clearInBuffer();
+        Clear_Buffer();
+        /*
+        if (workprogramm == '@')
+        {
+            sortWritWords();
+            work on mistakes();
+        }
+        */
     }
 
     fclose(rus);
